@@ -1,0 +1,6 @@
+E:\CabiNet\CabiNet\bin\Debug\CabiNet.dll
+E:\CabiNet\CabiNet\bin\Debug\CabiNet.pdb
+E:\CabiNet\CabiNet\obj\Debug\ResolveAssemblyReference.cache
+E:\CabiNet\CabiNet\obj\Debug\CabiNet.dll
+E:\CabiNet\CabiNet\obj\Debug\CabiNet.pdb
+E:\CabiNet\CabiNet\bin\Debug\CabiNet.XML

@@ -1,0 +1,9 @@
+E:\CabiNet\CabiNetGenerator\bin\Debug\CabiNetGenerator.exe
+E:\CabiNet\CabiNetGenerator\bin\Debug\CabiNetGenerator.pdb
+E:\CabiNet\CabiNetGenerator\obj\x86\Debug\ResolveAssemblyReference.cache
+E:\CabiNet\CabiNetGenerator\obj\x86\Debug\CabiNetGenerator.Properties.Resources.resources
+E:\CabiNet\CabiNetGenerator\obj\x86\Debug\GenerateResource.read.1.tlog
+E:\CabiNet\CabiNetGenerator\obj\x86\Debug\GenerateResource.write.1.tlog
+E:\CabiNet\CabiNetGenerator\obj\x86\Debug\CabiNetGenerator.exe
+E:\CabiNet\CabiNetGenerator\obj\x86\Debug\CabiNetGenerator.pdb
+E:\CabiNet\CabiNetGenerator\obj\x86\Debug\CabiNet.Generator.Form1.resources
