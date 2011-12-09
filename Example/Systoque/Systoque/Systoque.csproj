@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{228E1E6C-FD2A-4731-A2D7-BF75988F47BB}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Systoque</RootNamespace>
+    <AssemblyName>Systoque</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CabiNet, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\CabiNet\CabiNet\bin\Release\CabiNet.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DB\Banco.cs" />
+    <Compile Include="DB\Item.cs" />
+    <Compile Include="DB\Produto.cs" />
+    <Compile Include="DB\Venda.cs" />
+    <Compile Include="DB\Vendedor.cs" />
+    <Compile Include="Frms\PedidoFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frms\PedidoFrm.Designer.cs">
+      <DependentUpon>PedidoFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frms\ProdutoFaltantesFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frms\ProdutoFaltantesFrm.Designer.cs">
+      <DependentUpon>ProdutoFaltantesFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frms\ProdutoFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frms\ProdutoFrm.Designer.cs">
+      <DependentUpon>ProdutoFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frms\RelatorioExtratoComissaoFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frms\RelatorioExtratoComissaoFrm.Designer.cs">
+      <DependentUpon>RelatorioExtratoComissaoFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frms\RelatorioFaturamentoPeriodoFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frms\RelatorioFaturamentoPeriodoFrm.Designer.cs">
+      <DependentUpon>RelatorioFaturamentoPeriodoFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frms\RelatorioProdutosEstoqueFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frms\RelatorioProdutosEstoqueFrm.Designer.cs">
+      <DependentUpon>RelatorioProdutosEstoqueFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ItemDecorator.cs" />
+    <Compile Include="MainFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainFrm.Designer.cs">
+      <DependentUpon>MainFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Frms\VendedorFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frms\VendedorFrm.Designer.cs">
+      <DependentUpon>VendedorFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Relatorios\ExtratoComissao.cs" />
+    <Compile Include="Relatorios\VendaExtratoComissaoExt.cs" />
+    <EmbeddedResource Include="Frms\PedidoFrm.resx">
+      <DependentUpon>PedidoFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Frms\ProdutoFaltantesFrm.resx">
+      <DependentUpon>ProdutoFaltantesFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Frms\ProdutoFrm.resx">
+      <DependentUpon>ProdutoFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Frms\RelatorioExtratoComissaoFrm.resx">
+      <DependentUpon>RelatorioExtratoComissaoFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Frms\RelatorioFaturamentoPeriodoFrm.resx">
+      <DependentUpon>RelatorioFaturamentoPeriodoFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Frms\RelatorioProdutosEstoqueFrm.resx">
+      <DependentUpon>RelatorioProdutosEstoqueFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Frms\VendedorFrm.resx">
+      <DependentUpon>VendedorFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainFrm.resx">
+      <DependentUpon>MainFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,257 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CabiNet</name>
+    </assembly>
+    <members>
+        <member name="T:CabiNet.NotNullAttribute">
+            <summary>
+            Defines that this attribute is non nullable
+            </summary>
+        </member>
+        <member name="T:CabiNet.PersistentAttribute">
+            <summary>
+            Define which attributes should be stored
+            </summary>
+        </member>
+        <member name="T:CabiNet.Shelf`1">
+            <summary>
+            Wrapper for managing the data on the database
+            </summary>
+            <typeparam name="T">The IThing class to be managed</typeparam>
+        </member>
+        <member name="M:CabiNet.Shelf`1.#ctor(System.Data.Odbc.OdbcConnection)">
+            <summary>
+            Initialize with conection
+            </summary>
+            <param name="con">the ODBC connection</param>
+        </member>
+        <member name="M:CabiNet.Shelf`1.All">
+            <summary>
+            Get all the registers ont the database
+            </summary>
+            <returns>Array of the shelved things</returns>
+        </member>
+        <member name="M:CabiNet.Shelf`1.Insert(`0)">
+            <summary>
+            Insert a the shelved thing on the database
+            </summary>
+            <param name="thing">The new thing to be inserted</param>
+            <returns>The same thing updated</returns>
+            <exception cref="T:CabiNet.AlreadySavedException">If the thing already have an id</exception>
+        </member>
+        <member name="M:CabiNet.Shelf`1.Insert(System.Collections.Generic.IEnumerable{`0},System.Boolean)">
+            <summary>
+            Insert a the shelved thing on the database
+            </summary>
+            <param name="things">The new thing's list to be inserted</param>
+            <param name="safe">Only insert the not saved things</param>
+            <returns>The same thing updated</returns>
+            <exception cref="T:CabiNet.AlreadySavedException">If the thing already have an id</exception>
+        </member>
+        <member name="M:CabiNet.Shelf`1.Update``1(``0)">
+            <summary>
+            Update a thing on the database
+            </summary>
+            <typeparam name="TItem">The current shelf type</typeparam>
+            <param name="thing">The thing to be inserted</param>
+            <exception cref="T:CabiNet.MissingThing">If there the thing to be inserted has no Id</exception>
+        </member>
+        <member name="M:CabiNet.Shelf`1.Update``1(System.Collections.Generic.IEnumerable{``0},System.Boolean)">
+            <summary>
+            Update a thing on the database
+            </summary>
+            <typeparam name="TItem">The current shelf type</typeparam>
+            <param name="things">The things list to be inserted</param>
+            <param name="safe">Update only already saved things</param>
+            <exception cref="T:CabiNet.MissingThing">If there the thing to be inserted has no Id</exception>
+        </member>
+        <member name="M:CabiNet.Shelf`1.FindById(System.Int64)">
+            <summary>
+            Gets a thing from the shelve
+            </summary>
+            <param name="id">The id of the thing</param>
+            <returns>The thing or null</returns>
+        </member>
+        <member name="M:CabiNet.Shelf`1.Delete``1(``0)">
+            <summary>
+            Delete the thing from the database
+            </summary>
+            <typeparam name="TItem">The current shelf type</typeparam>
+            <param name="thing">The thing to be deleted</param>
+            <exception cref="T:CabiNet.MissingThing">If the id of the thing is 0</exception>
+        </member>
+        <member name="M:CabiNet.Shelf`1.Delete``1(System.Collections.Generic.IEnumerable{``0},System.Boolean)">
+            <summary>
+            Delete the thing from the database
+            </summary>
+            <typeparam name="TItem">The current shelf type</typeparam>
+            <param name="things">The thing's list to be deleted</param>
+            <param name="safe">Delete only the already saved things</param>
+            <exception cref="T:CabiNet.MissingThing">If the any id of the thing is 0</exception>
+        </member>
+        <member name="M:CabiNet.Shelf`1.Count">
+            <summary>
+            Count the size of the shelf
+            </summary>
+            <returns>The size</returns>
+        </member>
+        <member name="M:CabiNet.Shelf`1.DeleteAll">
+            <summary>
+            Delete all the things on the shelf
+            </summary>
+        </member>
+        <member name="M:CabiNet.Shelf`1.First">
+            <summary>
+            Return the first inserted collumn ( By the id )
+            </summary>
+            <returns>The first thing</returns>
+        </member>
+        <member name="M:CabiNet.Shelf`1.Last">
+            <summary>
+            Return the last inserted collumn ( By the id )
+            </summary>
+            <returns>The last thing</returns>
+        </member>
+        <member name="M:CabiNet.Shelf`1.PrepareConnection">
+            <summary>
+            Prepare the connection
+            </summary>
+        </member>
+        <member name="M:CabiNet.Shelf`1.CloseConnection">
+            <summary>
+            Close the conectin
+            </summary>
+        </member>
+        <member name="M:CabiNet.HasLotsOf`1.All">
+            <summary>
+            Gets all the related columns
+            </summary>
+            <returns>Array of things</returns>
+        </member>
+        <member name="T:CabiNet.MaxLengthAttribute">
+            <summary>
+            Defines the max length of attribute
+            </summary>
+        </member>
+        <member name="T:CabiNet.IThing">
+            <summary>
+            The IThing is a wrapper for the default properties of a table.
+            Must me inherited from others classes
+            </summary>
+        </member>
+        <member name="M:CabiNet.IThing.IsNew">
+            <summary>
+            Returns whether this thing is new or it's on the database already
+            </summary>
+            <returns>True if new</returns>
+        </member>
+        <member name="M:CabiNet.IThing.Validate">
+            <summary>
+            Validate the properties
+            </summary>
+            <returns>True if valid</returns>
+            <exception cref="T:CabiNet.NotNullException">If non nullable attributes are null</exception>
+            <exception cref="T:CabiNet.MaxLengthOverflowException">If a attribute is over the seted length</exception>
+        </member>
+        <member name="M:CabiNet.IThing.IsValid">
+            <summary>
+            A safer way to validate the current thing
+            </summary>
+            <returns>True if valid</returns>
+        </member>
+        <member name="M:CabiNet.IThing.InvalidMaxLengthProperty(System.Collections.Generic.KeyValuePair{System.Reflection.PropertyInfo,System.Int32})">
+            <summary>
+            Check if a property overflowed
+            </summary>
+            <param name="restriction">the property with the size</param>
+            <returns>True if invalid</returns>
+        </member>
+        <member name="M:CabiNet.IThing.PropertyNames">
+            <summary>
+            Cache the properties names of the thing
+            </summary>
+            <returns>Array of properties names</returns>
+        </member>
+        <member name="M:CabiNet.IThing.ValidProperty(System.String)">
+            <summary>
+            Check if there is an existing collumn on the thing
+            </summary>
+            <param name="property">The column name to be checked</param>
+            <returns>True if valid</returns>
+        </member>
+        <member name="M:CabiNet.IThing.HasLotsOf``1">
+            <summary>
+            Cache and return a relational shelf
+            </summary>
+            <typeparam name="T">The IThing related (Using the default classname_id)</typeparam>
+            <returns>A shelf of the desired type</returns>
+        </member>
+        <member name="M:CabiNet.IThing.HasLotsOf``1(System.String)">
+            <summary>
+            Cache and return a relational shelf
+            </summary>
+            <typeparam name="T">The IThing related (Using the default relationalColumn)</typeparam>
+            <param name="relationalColumn">The column to use on the ralationship</param>
+            <returns>A shelf of the desired type</returns>
+        </member>
+        <member name="M:CabiNet.IThing.GenerateCreateSQL">
+            <summary>
+            Generate the CREATE TABLE statement for the current Thing Class
+            </summary>
+            <returns>Thq SQL Create query</returns>
+        </member>
+        <member name="M:CabiNet.IThing.Clone">
+            <summary>
+            Return the shallow copy of the object
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CabiNet.IThing.Validation``1(System.Func{``0,System.Boolean})">
+            <summary>
+            Add a custom validation to the validation actions
+            </summary>
+            <typeparam name="T">T: The current class name</typeparam>
+            <param name="val">The validation</param>
+        </member>
+        <member name="M:CabiNet.IThing.DoBeforeValidation``1(System.Action{``0})">
+            <summary>
+            Store actions do do with your object before validation
+            </summary>
+            <typeparam name="T">The current class name</typeparam>
+            <param name="action">The action to do</param>
+        </member>
+        <member name="M:CabiNet.IThing.DoAfterValidation``1(System.Action{``0})">
+            <summary>
+            Store actions do do with your object after validation
+            </summary>
+            <typeparam name="T">The current class name</typeparam>
+            <param name="action">The action to do</param>
+        </member>
+        <member name="M:CabiNet.ICabinet.#ctor(System.String)">
+            <summary>
+            Create a new manager for the shelfs
+            </summary>
+            <param name="ConnectionString">The conection string to the database</param>
+        </member>
+        <member name="M:CabiNet.ICabinet.ExecuteNonQuery(System.String)">
+            <summary>
+            Run a non query sql on the database
+            </summary>
+            <param name="sql">The Query</param>
+        </member>
+        <member name="M:CabiNet.ICabinet.Shelve``1">
+            <summary>
+            Cache a shelf on a variable
+            </summary>
+            <typeparam name="I">The type of the shelf</typeparam>
+        </member>
+        <member name="M:CabiNet.ICabinet.Unshelve``1">
+            <summary>
+            Cache and return a shelf maneged by this cabinet
+            </summary>
+            <typeparam name="T">The type of the desired shelf</typeparam>
+            <returns>A shelf of the desired type</returns>
+        </member>
+    </members>
+</doc>
