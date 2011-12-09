@@ -1,26 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Data.Odbc;
 
 
 namespace CabiNet
 {
+    /// <summary>
+    /// The cabinet, where the Thing are stored
+    /// </summary>
     abstract public class ICabinet
     {
-        protected OdbcConnection connection;
-        private IDictionary<string, object> Tables = new Dictionary<string, object>();
+        protected OdbcConnection Connection;
+        private readonly IDictionary<string, object> _tables = new Dictionary<string, object>();
 
         /// <summary>
         /// Create a new manager for the shelfs
         /// </summary>
-        /// <param name="ConnectionString">The conection string to the database</param>
-        public ICabinet(string ConnectionString)
+        /// <param name="connectionString">The conection string to the database</param>
+        protected ICabinet(string connectionString)
         {
-            connection = new OdbcConnection(ConnectionString);
+            Connection = new OdbcConnection(connectionString);
 
-            if (connection.State == ConnectionState.Closed)
-                connection.Open();
+            if (Connection.State == ConnectionState.Closed)
+                Connection.Open();
 
         }
 
@@ -33,30 +35,26 @@ namespace CabiNet
         {
             try
             {
-                if (connection.State == ConnectionState.Closed)
-                    connection.Open();
-                ((OdbcCommand)new OdbcCommand(sql, connection)).ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                throw e;
+                if (Connection.State == ConnectionState.Closed)
+                    Connection.Open();
+                new OdbcCommand(sql, Connection).ExecuteNonQuery();
             }
             finally
             {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                if (Connection.State != ConnectionState.Closed)
+                    Connection.Close();
             }
         }
 
         /// <summary>
         /// Cache a shelf on a variable
         /// </summary>
-        /// <typeparam name="I">The type of the shelf</typeparam>
-        protected void Shelve<I>() where I : IThing, new()
+        /// <typeparam name="T">The type of the shelf</typeparam>
+        protected void Shelve<T>() where T : IThing, new()
         {
-            Shelf<I> shelf = new Shelf<I>(connection);
-            if (!Tables.ContainsKey(shelf.TableName))
-                Tables.Add(shelf.TableName, shelf);
+            Shelf<T> shelf = new Shelf<T>(Connection);
+            if (!_tables.ContainsKey(shelf.TableName))
+                _tables.Add(shelf.TableName, shelf);
         }
 
         /// <summary>
@@ -66,11 +64,11 @@ namespace CabiNet
         /// <returns>A shelf of the desired type</returns>
         protected Shelf<T> Unshelve<T>() where T : IThing, new()
         {
-            string TableName = typeof(T).Name;
-            if (!Tables.ContainsKey(TableName))
+            string tableName = typeof(T).Name;
+            if (!_tables.ContainsKey(tableName))
                 Shelve<T>();
 
-            return (Shelf<T>)Tables[TableName];
+            return (Shelf<T>)_tables[tableName];
         }
 
     }

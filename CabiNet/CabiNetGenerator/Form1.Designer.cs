@@ -39,11 +39,11 @@
             this.dataTables = new System.Windows.Forms.DataGridView();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.dataColumns = new System.Windows.Forms.DataGridView();
-            this.TypeCollumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
+            this.TypeCollumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataTables)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -160,17 +160,6 @@
             this.dataColumns.Size = new System.Drawing.Size(969, 168);
             this.dataColumns.TabIndex = 1;
             // 
-            // TypeCollumn
-            // 
-            this.TypeCollumn.HeaderText = "Type";
-            this.TypeCollumn.Items.AddRange(new object[] {
-            "String",
-            "Int32",
-            "Int64",
-            "Boolean",
-            "Datetime"});
-            this.TypeCollumn.Name = "TypeCollumn";
-            // 
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.dataColumns);
@@ -205,6 +194,19 @@
             this.toolStripLabel2.Size = new System.Drawing.Size(46, 22);
             this.toolStripLabel2.Text = "Restore";
             this.toolStripLabel2.Click += new System.EventHandler(this.toolStripLabel2_Click);
+            // 
+            // TypeCollumn
+            // 
+            this.TypeCollumn.HeaderText = "Type";
+            this.TypeCollumn.Items.AddRange(new object[] {
+            "String",
+            "Int32",
+            "Int64",
+            "Boolean",
+            "DateTime",
+            "Double",
+            "Float"});
+            this.TypeCollumn.Name = "TypeCollumn";
             // 
             // Form1
             // 
@@ -244,11 +246,11 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.DataGridView dataColumns;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.DataGridViewComboBoxColumn TypeCollumn;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.ToolStripLabel toolStripLabel2;
+        private System.Windows.Forms.DataGridViewComboBoxColumn TypeCollumn;
     }
 }
 

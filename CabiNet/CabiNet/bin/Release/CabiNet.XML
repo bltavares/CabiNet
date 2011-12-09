@@ -140,6 +140,12 @@
             Must me inherited from others classes
             </summary>
         </member>
+        <member name="M:CabiNet.IThing.IsNew">
+            <summary>
+            Returns whether this thing is new or it's on the database already
+            </summary>
+            <returns>True if new</returns>
+        </member>
         <member name="M:CabiNet.IThing.Validate">
             <summary>
             Validate the properties
@@ -194,6 +200,33 @@
             Generate the CREATE TABLE statement for the current Thing Class
             </summary>
             <returns>Thq SQL Create query</returns>
+        </member>
+        <member name="M:CabiNet.IThing.Clone">
+            <summary>
+            Return the shallow copy of the object
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CabiNet.IThing.Validation``1(System.Func{``0,System.Boolean})">
+            <summary>
+            Add a custom validation to the validation actions
+            </summary>
+            <typeparam name="T">T: The current class name</typeparam>
+            <param name="val">The validation</param>
+        </member>
+        <member name="M:CabiNet.IThing.DoBeforeValidation``1(System.Action{``0})">
+            <summary>
+            Store actions do do with your object before validation
+            </summary>
+            <typeparam name="T">The current class name</typeparam>
+            <param name="action">The action to do</param>
+        </member>
+        <member name="M:CabiNet.IThing.DoAfterValidation``1(System.Action{``0})">
+            <summary>
+            Store actions do do with your object after validation
+            </summary>
+            <typeparam name="T">The current class name</typeparam>
+            <param name="action">The action to do</param>
         </member>
         <member name="M:CabiNet.ICabinet.#ctor(System.String)">
             <summary>

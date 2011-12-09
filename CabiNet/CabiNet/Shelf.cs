@@ -13,8 +13,11 @@ namespace CabiNet
     /// <typeparam name="T">The IThing class to be managed</typeparam>
     public class Shelf<T> where T : IThing, new()
     {
+        /// <summary>
+        /// The name of the table of this shelf
+        /// </summary>
         public string TableName { get; private set; }
-        protected OdbcConnection connection;
+        protected OdbcConnection Connection;
         protected MysqlBuilder.MysqlCommandBuilder MySqlBuilder;
 
         /// <summary>
@@ -24,7 +27,7 @@ namespace CabiNet
         public Shelf(OdbcConnection con)
         {
             TableName = typeof(T).Name;
-            connection = con;
+            Connection = con;
             MySqlBuilder = new MysqlBuilder.MysqlCommandBuilder(TableName);
         }
 
@@ -34,14 +37,7 @@ namespace CabiNet
         /// <returns>Array of the shelved things</returns>
         virtual public T[] All()
         {
-            try
-            {
-                return EnumerableFor(MySqlBuilder.BuildSelectAll()).ToArray();
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
+            return EnumerableFor(MySqlBuilder.BuildSelectAll()).ToArray();
         }
 
         /// <summary>
@@ -55,7 +51,7 @@ namespace CabiNet
             if (thing.Id != 0)
                 throw new AlreadySavedException(TableName);
 
-            return Insert(new T[] { thing }).First();
+            return Insert(new[] { thing }, true).First();
         }
 
         /// <summary>
@@ -65,40 +61,42 @@ namespace CabiNet
         /// <param name="safe">Only insert the not saved things</param>
         /// <returns>The same thing updated</returns>
         /// <exception cref="AlreadySavedException">If the thing already have an id</exception>
-        public IEnumerable<T> Insert(IEnumerable<T> things, bool safe = true)
+        public IEnumerable<T> Insert(IEnumerable<T> things, bool safe)
         {
-            if (!safe)
+            T[] allThings;
+            if (safe)
             {
-                if (things.Any(thing => thing.Id != 0))
+                allThings = things.Where(thing => thing.Id != 0).ToArray();
+
+            }
+            else
+            {
+                allThings = things.ToArray();
+                if (allThings.Any(thing => thing.Id != 0))
                     throw new AlreadySavedException(TableName);
             }
-            IEnumerable<T> safe_things = things.Where(thing => thing.Id != 0);
             try
             {
 
                 PrepareConnection();
-                foreach (T thing in things)
+                foreach (T thing in allThings)
                 {
                     thing.Validate();
-                    AttributesExtractor<T> Properties = new AttributesExtractor<T>(thing);
-                    string query = MySqlBuilder.BuildInsert(Properties.PersistentAttributes());
-                    OdbcCommand command = new OdbcCommand(query, connection);
+                    AttributesExtractor<T> properties = new AttributesExtractor<T>(thing);
+                    string query = MySqlBuilder.BuildInsert(properties.PersistentAttributes());
+                    OdbcCommand command = new OdbcCommand(query, Connection);
                     command.ExecuteNonQuery();
-                    command.CommandText = MySqlBuilder.BuildLastID();
+                    command.CommandText = MySqlBuilder.BuildLastId();
                     Int64 lastId = (Int64)command.ExecuteScalar();
                     thing.Id = lastId;
-                    thing.SetConnection(connection);
+                    thing.SetConnection(Connection);
                 }
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
             finally
             {
                 CloseConnection();
             }
-            return safe_things;
+            return allThings;
         }
 
         /// <summary>
@@ -112,7 +110,7 @@ namespace CabiNet
             if (thing.Id == 0)
                 throw new MissingThing(TableName);
 
-            Update<TItem>(new TItem[] { thing });
+            Update(new[] { thing }, true);
         }
 
         /// <summary>
@@ -122,30 +120,31 @@ namespace CabiNet
         /// <param name="things">The things list to be inserted</param>
         /// <param name="safe">Update only already saved things</param>
         /// <exception cref="MissingThing">If there the thing to be inserted has no Id</exception>
-        public void Update<TItem>(IEnumerable<TItem> things, bool safe = true) where TItem : T
+        public void Update<TItem>(IEnumerable<TItem> things, bool safe) where TItem : T
         {
-            if (!safe)
+            T[] allThings;
+            if (safe)
             {
-                if (things.Any(thing => thing.Id == 0))
+                allThings = things.Where(thing => thing.Id != 0).ToArray();
+            }
+            else
+            {
+                allThings = things.ToArray();
+                if (allThings.Any(thing => thing.Id == 0))
                     throw new MissingThing(TableName);
             }
-            IEnumerable<TItem> safe_things = things.Where(thing => thing.Id != 0);
 
             try
             {
                 PrepareConnection();
-                foreach (TItem thing in safe_things)
+                foreach (TItem thing in allThings)
                 {
                     thing.Validate();
-                    AttributesExtractor<T> Properties = new AttributesExtractor<T>(thing);
-                    string query = MySqlBuilder.BuildUpdate(Properties.PersistentAttributes(), thing);
-                    OdbcCommand command = new OdbcCommand(query, connection);
+                    AttributesExtractor<T> properties = new AttributesExtractor<T>(thing);
+                    string query = MySqlBuilder.BuildUpdate(properties.PersistentAttributes(), thing);
+                    OdbcCommand command = new OdbcCommand(query, Connection);
                     command.ExecuteNonQuery();
                 }
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
             finally
             {
@@ -160,32 +159,43 @@ namespace CabiNet
         /// <returns>The thing or null</returns>
         public T FindById(Int64 id)
         {
-            try
-            {
-                return EnumerableFor(MySqlBuilder.BuildFindBy(id)).FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
+            return EnumerableFor(MySqlBuilder.BuildFindBy(id)).FirstOrDefault();
         }
 
 
+        /// <summary>
+        /// Filters the query using the = comparison on mysql
+        /// </summary>
+        /// <param name="collumn">the column to be checked</param>
+        /// <param name="value">The value to be used on the comparison</param>
+        /// <returns>Array of Things</returns>
         public T[] Where(string collumn, object value)
         {
-            return Where(collumn, WhereConditions.EQUAL, value);
+            return Where(collumn, WhereConditions.Equal, value, false);
         }
-
+        /// <summary>
+        /// Filters the query using the defined comparison on mysql
+        /// </summary>
+        /// <param name="collumn">the column to be checked</param>
+        /// <param name="condition">The type onf comparison</param>
+        /// <param name="value">The value to be used on the comparison</param>
+        /// <returns>Array of Things</returns>
         public T[] Where(string collumn, WhereConditions condition, object value)
         {
-            try
-            {
-                return EnumerableFor(MySqlBuilder.BuildWhere(collumn, condition, value)).ToArray();
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
+            return Where(collumn, condition, value, false);
+        }
+        /// <summary>
+        /// Filters the query using the defined comparison on mysql, defining to skip the injection filter
+        /// You can compare columns that way
+        /// </summary>
+        /// <param name="collumn">the column to be checked</param>
+        /// <param name="condition">The type onf comparison</param>
+        /// <param name="value">The name of the column to be used</param>
+        /// <param name="comparingCollumns">True skip the injection filter</param>
+        /// <returns></returns>
+        public T[] Where(string collumn, WhereConditions condition, object value, bool comparingCollumns)
+        {
+            return EnumerableFor(MySqlBuilder.BuildWhere(collumn, condition, value, comparingCollumns)).ToArray();
         }
 
         /// <summary>
@@ -198,7 +208,7 @@ namespace CabiNet
         {
             if (thing.Id == 0)
                 throw new MissingThing(TableName);
-            Delete<TItem>(new TItem[] { thing });
+            Delete<TItem>(new[] { thing });
         }
 
         /// <summary>
@@ -210,26 +220,27 @@ namespace CabiNet
         /// <exception cref="MissingThing">If the any id of the thing is 0</exception>
         public void Delete<TItem>(IEnumerable<TItem> things, bool safe = true) where TItem : T
         {
-            if (!safe)
+            T[] allThings;
+            if (safe)
             {
-                if (things.Any(thing => thing.Id == 0))
+                allThings = things.Where(thing => thing.Id != 0).ToArray();
+            }
+            else
+            {
+                allThings = things.ToArray();
+                if (allThings.Any(thing => thing.Id == 0))
                     throw new MissingThing(TableName);
-
             }
 
             try
             {
                 PrepareConnection();
-                foreach (TItem thing in things.Where(thing => thing.Id != 0))
+                foreach (TItem thing in allThings)
                 {
                     string query = MySqlBuilder.BuildDelete(thing);
-                    OdbcCommand command = new OdbcCommand(query, connection);
+                    OdbcCommand command = new OdbcCommand(query, Connection);
                     command.ExecuteNonQuery();
                 }
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
             finally
             {
@@ -246,13 +257,9 @@ namespace CabiNet
             try
             {
                 PrepareConnection();
-                OdbcCommand command = new OdbcCommand(MySqlBuilder.BuildCount(), connection);
+                OdbcCommand command = new OdbcCommand(MySqlBuilder.BuildCount(), Connection);
                 Int64 size = (Int64)command.ExecuteScalar();
                 return size;
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
             finally
             {
@@ -269,12 +276,8 @@ namespace CabiNet
             {
                 PrepareConnection();
                 string query = MySqlBuilder.BuildDeleteAll();
-                OdbcCommand command = new OdbcCommand(query, connection);
+                OdbcCommand command = new OdbcCommand(query, Connection);
                 command.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
             finally
             {
@@ -305,8 +308,8 @@ namespace CabiNet
         /// </summary>
         protected void PrepareConnection()
         {
-            if (connection.State == ConnectionState.Closed)
-                connection.Open();
+            if (Connection.State == ConnectionState.Closed)
+                Connection.Open();
         }
 
         /// <summary>
@@ -314,8 +317,8 @@ namespace CabiNet
         /// </summary>
         protected void CloseConnection()
         {
-            if (connection.State != ConnectionState.Open)
-                connection.Close();
+            if (Connection.State != ConnectionState.Open)
+                Connection.Close();
         }
 
         protected IEnumerable<T> EnumerableFor(string query)
@@ -323,19 +326,18 @@ namespace CabiNet
             try
             {
                 PrepareConnection();
-                OdbcCommand command = new OdbcCommand(query, connection);
+                OdbcCommand command = new OdbcCommand(query, Connection);
                 OdbcDataReader reader = command.ExecuteReader();
-                T output;
 
                 while (reader.Read())
                 {
-                    output = new T();
-                    AttributesExtractor<T> Properties = new AttributesExtractor<T>(output);
+                    T output = new T();
+                    AttributesExtractor<T> properties = new AttributesExtractor<T>(output);
                     output.Id = Convert.ToInt64(reader["Id"]);
-                    foreach (PropertyInfo prop in Properties.PersistentProperties())
+                    foreach (PropertyInfo prop in properties.PersistentProperties())
                         prop.SetValue(output, reader[prop.Name], null);
 
-                    output.SetConnection(connection);
+                    output.SetConnection(Connection);
                     yield return output;
                 }
             }

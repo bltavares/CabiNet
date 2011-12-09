@@ -7,3 +7,5 @@ E:\CabiNet\CabiNetGenerator\bin\Release\CabiNetGenerator.pdb
 E:\CabiNet\CabiNetGenerator\obj\x86\Release\CabiNetGenerator.exe
 E:\CabiNet\CabiNetGenerator\obj\x86\Release\CabiNetGenerator.pdb
 E:\CabiNet\CabiNetGenerator\obj\x86\Release\CabiNet.Generator.Form1.resources
+C:\Users\bruno.tavares\Downloads\CabiNet\CabiNetGenerator\obj\x86\Release\CabiNetGenerator.exe
+C:\Users\bruno.tavares\Downloads\CabiNet\CabiNetGenerator\obj\x86\Release\CabiNetGenerator.pdb

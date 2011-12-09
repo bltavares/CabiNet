@@ -1,8 +1,38 @@
 ﻿
 namespace CabiNet
 {
+    /// <summary>
+    /// SQL conditions
+    /// </summary>
     public enum WhereConditions
     {
-        EQUAL, DIFERENT, HIHGER, LOWER, HIGHERorEQUAL, LOWERorEQUAL, LIKE
+        /// <summary>
+        /// =
+        /// </summary>
+        Equal,
+        /// <summary>
+        /// &lt;>
+        /// </summary>
+        Diferent,
+        /// <summary>
+        /// >
+        /// </summary>
+        Hihger,
+        /// <summary>
+        /// &lt;
+        /// </summary>
+        Lower,
+        /// <summary>
+        /// >=
+        /// </summary>
+        HigherOrEqual,
+        /// <summary>
+        /// &lt;=
+        /// </summary>
+        LowerOrEqual,
+        /// <summary>
+        /// like
+        /// </summary>
+        Like
     }
 }

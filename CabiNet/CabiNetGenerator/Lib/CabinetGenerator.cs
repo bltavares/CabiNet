@@ -45,7 +45,7 @@ You may want to use it to generete de tables on the first run also:
 ";
 
         static string QueryGenerator = @"
-db.ExecuteNonQuery((new {0}).GenerateCreateSQL());
+db.ExecuteNonQuery((new {0}()).GenerateCreateSQL());
 ";
 
         public string NameSpace { get; set; }

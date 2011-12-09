@@ -2,20 +2,27 @@
 
 namespace CabiNet
 {
+    /// <summary>
+    /// When a table is missing
+    /// </summary>
     public class MissingTableException : Exception
     {
-        private string TableName;
+        private readonly string _tableName;
 
+        /// <summary>
+        /// When a table is missing
+        /// </summary>
+        /// <param name="tableName">The table name</param>
         public MissingTableException(string tableName)
         {
-            TableName = tableName;
+            _tableName = tableName;
         }
 
         public override string Message
         {
             get
             {
-                return "Missing table: " + TableName;
+                return "Missing table: " + _tableName;
             }
         }
     }

@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C# Express 2010
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CabiNet", "CabiNet\CabiNet.csproj", "{990269AC-5FA1-4FC6-8D07-29EE3FCCD23C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CabiNetGenerator", "CabiNetGenerator\CabiNetGenerator.csproj", "{B62CBC50-6609-4264-B86C-2040E7AD1B84}"

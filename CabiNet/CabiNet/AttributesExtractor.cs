@@ -7,71 +7,73 @@ namespace CabiNet
 {
     class AttributesExtractor<T> where T : IThing, new()
     {
-        private T Thing;
+        private readonly T _thing;
         public AttributesExtractor(T thing)
         {
-            Thing = thing;
+            _thing = thing;
         }
 
         public PropertyInfo[] PersistentProperties()
         {
-            return Thing.GetType().GetProperties().Where(property =>
+            return _thing.GetType().GetProperties().Where(property =>
                 property.GetCustomAttributes(true).Contains(new PersistentAttribute())).ToArray();
         }
 
         public IDictionary<PropertyInfo, int> MaxLenghtProperties()
         {
-            IDictionary<PropertyInfo, int> MaxLengths = new Dictionary<PropertyInfo, int>();
+            IDictionary<PropertyInfo, int> maxLengths = new Dictionary<PropertyInfo, int>();
 
-            foreach (PropertyInfo property in Thing.GetType().GetProperties().Where(property =>
+            foreach (PropertyInfo property in _thing.GetType().GetProperties().Where(property =>
                         property.GetCustomAttributes(true).Any(attr =>
                             attr.GetType().Name == "MaxLengthAttribute")))
             {
                 MaxLengthAttribute attribute = (MaxLengthAttribute)property.GetCustomAttributes(true).FirstOrDefault(attr => ((MemberInfo)((Attribute)attr).TypeId).Name == "MaxLengthAttribute");
-                MaxLengths.Add(property, attribute.Size);
+                maxLengths.Add(property, attribute.Size);
             }
-            return MaxLengths;
+            return maxLengths;
         }
 
         public PropertyInfo[] NotNullProperties()
         {
-            return Thing.GetType().GetProperties().Where(property =>
+            return _thing.GetType().GetProperties().Where(property =>
                  property.GetCustomAttributes(true).Contains(new NotNullAttribute())).ToArray();
         }
 
         public IDictionary<string, object> PersistentAttributes()
         {
-            IDictionary<string, object> ThingProperties = new Dictionary<string, object>();
+            IDictionary<string, object> thingProperties = new Dictionary<string, object>();
 
             foreach (PropertyInfo prop in typeof(T).GetProperties().Where(property => property.GetCustomAttributes(true).Contains(new PersistentAttribute())))
-                ThingProperties.Add(prop.Name, prop.GetValue(Thing, null));
+                thingProperties.Add(prop.Name, prop.GetValue(_thing, null));
 
-            return ThingProperties;
+            return thingProperties;
 
         }
 
         public string[] PersistentAttributesList()
         {
-            IList<string> ThingProperties = new List<string>();
+            IList<string> thingProperties = new List<string>();
 
-            foreach (PropertyInfo prop in Thing.GetType().GetProperties().Where(property => property.GetCustomAttributes(true).Contains(new PersistentAttribute())))
-                ThingProperties.Add(prop.Name);
+            foreach (PropertyInfo prop in _thing.GetType().GetProperties().Where(property => property.GetCustomAttributes(true).Contains(new PersistentAttribute())))
+                thingProperties.Add(prop.Name);
 
-            return ThingProperties.ToArray();
+            return thingProperties.ToArray();
         }
 
         public ThingProperties[] PropertiesWithAttributes()
         {
             IList<ThingProperties> output = new List<ThingProperties>();
-            ThingProperties prop;
             foreach (PropertyInfo property in PersistentProperties())
             {
-                prop = new ThingProperties() { property = property };
-                prop.IsNullable = property.GetCustomAttributes(true).Contains(new NotNullAttribute());
+                ThingProperties prop = new ThingProperties
+                                           {
+                                               Property = property,
+                                               IsNullable = property.GetCustomAttributes(true).Contains(new NotNullAttribute())
+                                           };
                 switch (property.PropertyType.Name)
                 {
                     case "String":
-                        prop.type = "varchar";
+                        prop.Type = "varchar";
                         if (property.GetCustomAttributes(true).Any(attr => attr.GetType().Name == "MaxLengthAttribute"))
                         {
                             prop.IsMaxLength = true;
@@ -79,22 +81,25 @@ namespace CabiNet
                                                 FirstOrDefault(attr => ((MemberInfo)((Attribute)attr).TypeId).Name == "MaxLengthAttribute")).Size;
                         }
                         else
-                            prop.type += "(255)";
+                            prop.Type += "(255)";
                         break;
                     case "Boolean":
-                        prop.type = "tinyint(1)";
+                        prop.Type = "tinyint(1)";
                         break;
-                    case "Datetime":
-                        prop.type = "datetime";
+                    case "DateTime":
+                        prop.Type = "datetime";
                         break;
                     case "Int32":
-                        prop.type = "integer(9)";
+                        prop.Type = "integer(9)";
                         break;
                     case "Float":
-                        prop.type = "float";
+                        prop.Type = "float";
+                        break;
+                    case "Double":
+                        prop.Type = "double";
                         break;
                     case "Int64":
-                        prop.type = "integer(11)";
+                        prop.Type = "integer(11)";
                         break;
 
                 }

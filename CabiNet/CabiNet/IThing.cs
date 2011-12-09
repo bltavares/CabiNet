@@ -13,21 +13,33 @@ namespace CabiNet
     public class IThing
     {
 
-        private string CreateThingQuery = null;
+        private string _createThingQuery;
 
-        protected Int64 _id = 0;
-        private IDictionary<string, object> CachedRalationships = new Dictionary<string, object>();
+        protected Int64 _id;
+        private readonly IDictionary<string, object> _cachedRalationships = new Dictionary<string, object>();
+        private readonly IDictionary<string, IList<object>> _validationActions = new Dictionary<string, IList<object>>();
 
         protected string[] AttributesList;
-        private OdbcConnection _ShelfConnection;
-        public void SetConnection(OdbcConnection _con)
+        private OdbcConnection _shelfConnection;
+        /// <summary>
+        /// Set the connetion object to be used on this things
+        /// For relational purposes
+        /// </summary>
+        /// <param name="con">The ODBC connection object</param>
+        /// <exception cref="Exception">Already using a connection object</exception>
+        public void SetConnection(OdbcConnection con)
         {
-            if (_ShelfConnection != null)
-                throw new Exception();
+            if (_shelfConnection != null)
+                throw new Exception("Already using a connection object");
 
-            _ShelfConnection = _con;
+            _shelfConnection = con;
         }
-
+        
+        /// <summary>
+        /// The id of the current object
+        /// Can't set the id if it's already set
+        /// </summary>
+        /// <exception cref="IdChangeException">Can't set the id if it's already set</exception>
         [Id]
         public Int64 Id
         {
@@ -42,6 +54,15 @@ namespace CabiNet
         }
 
         /// <summary>
+        /// Returns whether this thing is new or it's on the database already
+        /// </summary>
+        /// <returns>True if new</returns>
+        public bool IsNew()
+        {
+            return Id == 0;
+        }
+
+        /// <summary>
         /// Validate the properties
         /// </summary>
         /// <returns>True if valid</returns>
@@ -49,6 +70,15 @@ namespace CabiNet
         /// <exception cref="MaxLengthOverflowException">If a attribute is over the seted length</exception>
         public bool Validate()
         {
+            foreach (object action in ValidationActionsFor("before"))
+                action.GetType().GetMethod("Invoke").Invoke(action, new object[] {this});
+
+            foreach (object action in ValidationActionsFor("validation"))
+            {
+                if (!(bool)action.GetType().GetMethod("Invoke").Invoke(action, new object[] { this }))
+                    throw new CustomValidationException();
+            }
+
             AttributesExtractor<IThing> attributes = new AttributesExtractor<IThing>(this);
             foreach (PropertyInfo prop in attributes.NotNullProperties())
             {
@@ -61,6 +91,10 @@ namespace CabiNet
                 if (InvalidMaxLengthProperty(maxprop))
                     throw new MaxLengthOverflowException(maxprop.Key.Name, maxprop.Value);
             }
+
+            foreach (object action in ValidationActionsFor("after"))
+                action.GetType().GetMethod("Invoke").Invoke(action, new object[] {this});
+
             return true;
         }
 
@@ -129,13 +163,13 @@ namespace CabiNet
         /// <returns>A shelf of the desired type</returns>
         public HasLotsOf<T> HasLotsOf<T>() where T : IThing, new()
         {
-            if (_ShelfConnection == null)
+            if (_shelfConnection == null)
                 throw new Exception();
-            string ralationName = this.GetType().Name + "_Id";
-            if (!CachedRalationships.ContainsKey(ralationName))
-                CachedRalationships.Add(ralationName, new HasLotsOf<T>(this, _ShelfConnection));
+            string ralationName = GetType().Name + "_Id";
+            if (!_cachedRalationships.ContainsKey(ralationName))
+                _cachedRalationships.Add(ralationName, new HasLotsOf<T>(this, _shelfConnection));
 
-            return (HasLotsOf<T>)CachedRalationships[ralationName];
+            return (HasLotsOf<T>)_cachedRalationships[ralationName];
         }
 
         /// <summary>
@@ -146,12 +180,12 @@ namespace CabiNet
         /// <returns>A shelf of the desired type</returns>
         public HasLotsOf<T> HasLotsOf<T>(string relationalColumn) where T : IThing, new()
         {
-            if (_ShelfConnection == null)
+            if (_shelfConnection == null)
                 throw new Exception();
-            if (!CachedRalationships.ContainsKey(relationalColumn))
-                CachedRalationships.Add(relationalColumn, new HasLotsOf<T>(this, relationalColumn, _ShelfConnection));
+            if (!_cachedRalationships.ContainsKey(relationalColumn))
+                _cachedRalationships.Add(relationalColumn, new HasLotsOf<T>(this, relationalColumn, _shelfConnection));
 
-            return (HasLotsOf<T>)CachedRalationships[relationalColumn];
+            return (HasLotsOf<T>)_cachedRalationships[relationalColumn];
         }
 
         /// <summary>
@@ -160,13 +194,67 @@ namespace CabiNet
         /// <returns>Thq SQL Create query</returns>
         public string GenerateCreateSQL()
         {
-            if (CreateThingQuery == null)
+            if (_createThingQuery == null)
             {
                 AttributesExtractor<IThing> attributes = new AttributesExtractor<IThing>(this);
                 MysqlBuilder.MysqlCommandBuilder builder = new MysqlBuilder.MysqlCommandBuilder(GetType().Name);
-                CreateThingQuery = builder.BuildCreate(attributes.PropertiesWithAttributes());
+                _createThingQuery = builder.BuildCreate(attributes.PropertiesWithAttributes());
             }
-            return CreateThingQuery;
+            return _createThingQuery;
         }
+
+        /// <summary>
+        /// Return the shallow copy of the object
+        /// </summary>
+        /// <returns></returns>
+        public virtual object Clone()
+        {
+            return MemberwiseClone();
+        }
+
+        /// <summary>
+        /// Add a custom validation to the validation actions
+        /// </summary>
+        /// <typeparam name="T">T: The current class name</typeparam>
+        /// <param name="val">The validation</param>
+        public void Validation<T>(Func<T, bool> val) where T : IThing
+        {
+            AddValidationAction("validation", val);
+        }
+
+        /// <summary>
+        /// Store actions do do with your object before validation
+        /// </summary>
+        /// <typeparam name="T">The current class name</typeparam>
+        /// <param name="action">The action to do</param>
+        public void DoBeforeValidation<T>(Action<T> action) where T : IThing
+        {
+            AddValidationAction("before", action);
+        }
+
+        /// <summary>
+        /// Store actions do do with your object after validation
+        /// </summary>
+        /// <typeparam name="T">The current class name</typeparam>
+        /// <param name="action">The action to do</param>
+        public void DoAfterValidation<T>(Action<T> action) where T : IThing
+        {
+            AddValidationAction("after", action);
+        }
+
+        private IEnumerable<object> ValidationActionsFor(string key)
+        {
+            return _validationActions.ContainsKey(key) ? _validationActions[key] : new List<Object>();
+        }
+
+        private void AddValidationAction(string key, object value)
+        {
+            if (!_validationActions.Any(dic => dic.Key == key))
+            {
+                _validationActions.Add(key, new List<object>());
+            }
+            _validationActions[key].Add(value);
+        }
+
     }
 }
